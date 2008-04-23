@@ -1,7 +1,7 @@
 require "config/environment"
 
 MODEL_DIR   = File.join(RAILS_ROOT, "app/models")
-FIXTURE_DIR = File.join(RAILS_ROOT, "test/fixtures")
+FIXTURE_DIR = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : "text"}/fixtures")
 
 module AnnotateModels
 
@@ -85,8 +85,7 @@ module AnnotateModels
   # Otherwise we take all the model files in the 
   # app/models directory.
   def self.get_model_names
-    models = ARGV.dup
-    models.shift
+    models = ENV['MODELS'] ? ENV['MODELS'].split(',') : []
     
     if models.empty?
       Dir.chdir(MODEL_DIR) do 
