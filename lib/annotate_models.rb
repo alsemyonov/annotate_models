@@ -1,7 +1,7 @@
 require "config/environment"
 
 MODEL_DIR   = File.join(RAILS_ROOT, "app/models")
-FIXTURE_DIR = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : "text"}/fixtures")
+FIXTURE_DIR = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : "test"}/fixtures")
 
 module AnnotateModels
 
@@ -30,7 +30,21 @@ module AnnotateModels
     info << "# Table name: #{klass.table_name}\n#\n"
     
     max_size = klass.column_names.collect{|name| name.size}.max + 1
-    klass.columns.each do |col|
+    if SORT_COLUMNS
+        pk    = klass.columns.find_all { |col| col.name == klass.primary_key }.flatten
+        assoc = klass.columns.find_all { |col| col.name.match(/_id$/) }.sort_by(&:name)
+        dates = klass.columns.find_all { |col| col.name.match(/_on$/) }.sort_by(&:name)
+        times = klass.columns.find_all { |col| col.name.match(/_at$/) }.sort_by(&:name)
+
+        pk + assoc + (klass.columns - pk - assoc - times - dates).compact.sort_by(&:name) + dates + times
+      else
+        klass.columns
+      end.each { |col| info << annotate_column(col, klass, max_size) }
+
+    info << "#\n\n"
+  end
+  
+  def self.annotate_column(col, klass, max_size)
       attrs = []
       attrs << "default(#{quote(col.default)})" if col.default
       attrs << "not null" unless col.null
@@ -42,10 +56,7 @@ module AnnotateModels
       else
         col_type << "(#{col.limit})" if col.limit
       end 
-      info << sprintf("#  %-#{max_size}.#{max_size}s:%-15.15s %s\n", col.name, col_type, attrs.join(", "))
-    end
-
-    info << "#\n\n"
+      sprintf("#  %-#{max_size}.#{max_size}s:%-15.15s %s\n", col.name, col_type, attrs.join(", "))
   end
 
   # Add a schema block to a file. If the file already contains
