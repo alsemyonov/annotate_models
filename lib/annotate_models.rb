@@ -2,6 +2,7 @@ require "config/environment"
 
 MODEL_DIR   = File.join(RAILS_ROOT, "app/models")
 FIXTURE_DIR = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : "test"}/fixtures")
+SORT_COLUMNS = ENV['SORT'] ? ENV['SORT'] == 'yes' : false
 
 module AnnotateModels
 
