@@ -91,7 +91,7 @@ module AnnotateModels
     model_file_name = File.join(MODEL_DIR, klass.name.underscore + ".rb")
     annotate_one_file(model_file_name, info)
     
-    rspec_model_file_name = File.join(RSPEC_MODEL_DIR, klass.name.underscore + "_spec.rb")
+    rspec_model_file_name = File.join(SPEC_MODEL_DIR, klass.name.underscore + "_spec.rb")
     annotate_one_file(rspec_model_file_name, info)
 
     fixture_file_name = File.join(FIXTURE_DIR, klass.table_name + ".yml")
