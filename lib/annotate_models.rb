@@ -1,12 +1,13 @@
 require "config/environment"
 
 MODEL_DIR   = File.join(RAILS_ROOT, "app/models")
+SPEC_MODEL_DIR  = File.join(RAILS_ROOT, "spec/models")
 FIXTURE_DIR = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : "test"}/fixtures")
 SORT_COLUMNS = ENV['SORT'] ? ENV['SORT'] != 'no' : true
 
 module AnnotateModels
 
-  PREFIX = "== Schema Information"
+  PREFIX = "== Schema Info"
   
   # Simple quoting for the default column value
   def self.quote(value)
@@ -63,6 +64,7 @@ module AnnotateModels
   # Add a schema block to a file. If the file already contains
   # a schema info block (a comment starting
   # with "Schema as of ..."), remove it first.
+  # Mod to write to the end of the file
 
   def self.annotate_one_file(file_name, info_block)
     if File.exist?(file_name)
@@ -72,7 +74,7 @@ module AnnotateModels
       content.sub!(/^# #{PREFIX}.*?\n(#.*\n)*\n/, '')
 
       # Write it back
-      File.open(file_name, "w") { |f| f.puts info_block + content }
+      File.open(file_name, "w") { |f| f.puts content + info_block }
     end
   end
   
@@ -86,6 +88,9 @@ module AnnotateModels
     
     model_file_name = File.join(MODEL_DIR, klass.name.underscore + ".rb")
     annotate_one_file(model_file_name, info)
+    
+    rspec_model_file_name = File.join(RSPEC_MODEL_DIR, klass.name.underscore + ".rb")
+    annotate_one_file(rspec_model_file_name, info)
 
     fixture_file_name = File.join(FIXTURE_DIR, klass.table_name + ".yml")
     annotate_one_file(fixture_file_name, info)
