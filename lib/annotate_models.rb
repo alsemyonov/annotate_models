@@ -74,7 +74,9 @@ module AnnotateModels
       content.sub!(/^# #{PREFIX}.*?\n(#.*\n)*\n/, '')
 
       # Write it back
-      File.open(file_name, "w") { |f| f.puts content + info_block }
+      File.open(file_name, "w") do |f| 
+        f.puts ENV['POSITION'] == 'top' ?  info_block + content : content + "\n" + info_block 
+      end
     end
   end
   
@@ -89,7 +91,7 @@ module AnnotateModels
     model_file_name = File.join(MODEL_DIR, klass.name.underscore + ".rb")
     annotate_one_file(model_file_name, info)
     
-    rspec_model_file_name = File.join(RSPEC_MODEL_DIR, klass.name.underscore + ".rb")
+    rspec_model_file_name = File.join(RSPEC_MODEL_DIR, klass.name.underscore + "_spec.rb")
     annotate_one_file(rspec_model_file_name, info)
 
     fixture_file_name = File.join(FIXTURE_DIR, klass.table_name + ".yml")
