@@ -7,4 +7,7 @@ namespace :db do
     require File.join(File.dirname(__FILE__), "../lib/annotate_models.rb")
     AnnotateModels.do_annotations
   end
+
+  desc "Updates database (migrate and annotate models)"
+  task :update => %w(migrate annotate)
 end
