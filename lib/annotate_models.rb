@@ -2,7 +2,7 @@ require "config/environment"
 
 MODEL_DIR   = File.join(RAILS_ROOT, "app/models")
 SPEC_MODEL_DIR  = File.join(RAILS_ROOT, "spec/models")
-FIXTURE_DIR = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : "test"}/fixtures")
+FIXTURE_DIR = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : SPEC_MODEL_DIR ? "spec" : "test"}/fixtures")
 SORT_COLUMNS = ENV['SORT'] ? ENV['SORT'] != 'no' : true
 
 module AnnotateModels
@@ -43,15 +43,15 @@ module AnnotateModels
         klass.columns
       end.each { |col| info << annotate_column(col, klass, max_size) }
 
-    info << "#\n\n"
+    info << "\n"
   end
   
   def self.annotate_column(col, klass, max_size)
       attrs = []
-      attrs << "default(#{quote(col.default)})" if col.default
-      attrs << "not null" unless col.null
+      attrs << "not null" unless col.null 
+      attrs << "default(#{quote(col.default)})" if col.default  
       attrs << "primary key" if col.name == klass.primary_key
-
+    
       col_type = col.type.to_s
       if col_type == "decimal"
         col_type << "(#{col.precision}, #{col.scale})"
@@ -75,7 +75,7 @@ module AnnotateModels
 
       # Write it back
       File.open(file_name, "w") do |f| 
-        f.puts ENV['POSITION'] == 'top' ?  info_block + content : content + "\n" + info_block 
+        f.puts ENV['POSITION'] == 'top' ?  info_block + content : content + info_block 
       end
     end
   end
