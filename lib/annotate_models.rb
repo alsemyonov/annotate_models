@@ -59,7 +59,7 @@ module AnnotateModels
       else
         col_type << "(#{col.limit})" if col.limit
       end 
-      sprintf("#  %-#{max_size}.#{max_size}s:%-15.15s %s\n", col.name, col_type, attrs.join(", "))
+      sprintf("#  %-#{max_size}.#{max_size}s:%-15.15s %s", col.name, col_type, attrs.join(", ")).rstrip << "\n"
   end
 
   # Add a schema block to a file. If the file already contains
