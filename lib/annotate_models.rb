@@ -1,9 +1,10 @@
 require "config/environment"
 
-MODEL_DIR   = File.join(RAILS_ROOT, "app/models")
+MODEL_DIR       = File.join(RAILS_ROOT, "app/models" )
 SPEC_MODEL_DIR  = File.join(RAILS_ROOT, "spec/models")
-FIXTURE_DIR = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : "test"}/fixtures")
-SORT_COLUMNS = ENV['SORT'] ? ENV['SORT'] != 'no' : true
+UNIT_TEST_DIR   = File.join(RAILS_ROOT, "test/unit"  )
+FIXTURE_DIR     = ENV['FIXTURES'] ? "#{ENV['FIXTURES']}/fixtures" : [File.join(RAILS_ROOT, "spec/fixtures"), File.join(RAILS_ROOT, "test/fixtures")].detect { |dir| File.exists?(dir) }
+SORT_COLUMNS    = ENV['SORT'] ? ENV['SORT'] != 'no' : true
 
 module AnnotateModels
 
@@ -43,22 +44,22 @@ module AnnotateModels
         klass.columns
       end.each { |col| info << annotate_column(col, klass, max_size) }
 
-    info << "#\n\n"
+    info << "\n"
   end
   
   def self.annotate_column(col, klass, max_size)
       attrs = []
-      attrs << "default(#{quote(col.default)})" if col.default
-      attrs << "not null" unless col.null
+      attrs << "not null" unless col.null 
+      attrs << "default(#{quote(col.default)})" if col.default  
       attrs << "primary key" if col.name == klass.primary_key
-
+    
       col_type = col.type.to_s
       if col_type == "decimal"
         col_type << "(#{col.precision}, #{col.scale})"
       else
         col_type << "(#{col.limit})" if col.limit
       end 
-      sprintf("#  %-#{max_size}.#{max_size}s:%-15.15s %s\n", col.name, col_type, attrs.join(", "))
+      sprintf("#  %-#{max_size}.#{max_size}s:%-15.15s %s", col.name, col_type, attrs.join(", ")).rstrip << "\n"
   end
 
   # Add a schema block to a file. If the file already contains
@@ -75,7 +76,7 @@ module AnnotateModels
 
       # Write it back
       File.open(file_name, "w") do |f| 
-        f.puts ENV['POSITION'] == 'top' ?  info_block + content : content + "\n" + info_block 
+        f.puts ENV['POSITION'] == 'top' ?  info_block + content : content + info_block 
       end
     end
   end
@@ -88,14 +89,12 @@ module AnnotateModels
   def self.annotate(klass, header)
     info = get_schema_info(klass, header)
     
-    model_file_name = File.join(MODEL_DIR, klass.name.underscore + ".rb")
-    annotate_one_file(model_file_name, info)
-    
-    rspec_model_file_name = File.join(SPEC_MODEL_DIR, klass.name.underscore + "_spec.rb")
-    annotate_one_file(rspec_model_file_name, info)
-
-    fixture_file_name = File.join(FIXTURE_DIR, klass.table_name + ".yml")
-    annotate_one_file(fixture_file_name, info)
+    [
+      File.join(MODEL_DIR, klass.name.underscore + ".rb"),            # model
+      File.join(SPEC_MODEL_DIR, klass.name.underscore + "_spec.rb"),  # spec
+      File.join(UNIT_TEST_DIR, klass.name.underscore + "_test.rb"),   # test
+      File.join(FIXTURE_DIR, klass.table_name + ".yml"),              # fixture
+    ].each { |file| annotate_one_file(file, info) }
   end
 
   # Return a list of the model files to annotate. If we have 

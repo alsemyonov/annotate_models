@@ -1,7 +1,7 @@
 AnnotateSchema
 ==============
 
-Add a comment summarizing the current schema to the top
+Add a comment summarizing the current schema to the bottom
 of each ActiveRecord model source file:
 
   # Schema as of Sun Feb 26 21:58:32 CST 2006 (schema version 7)
@@ -17,9 +17,24 @@ of each ActiveRecord model source file:
   
    . . .
   
-Note that this code will blow away the initial comment block in your models if it looks ike it was
+Note that this code will blow away the initial/final comment block in your models if it looks ike it was
 previously added by annotate models, so you don't want to add additional text to an automatically
 created comment block.
+
+
+== How to use:
+
+Will annotate all your models:
+
+  rake db:annotate
+  
+Options:
+Annotate on the head of the file:
+ 
+  rake db:annotate POSITION='top'
+  
+
+== License:
 
 Author:
    Dave Thomas
@@ -28,4 +43,3 @@ Author:
 Released under the same license as Ruby. No Support. No Warranty.
 
 Back up your model files before using...
-
