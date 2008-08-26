@@ -3,7 +3,7 @@ require "config/environment"
 MODEL_DIR       = File.join(RAILS_ROOT, "app/models" )
 SPEC_MODEL_DIR  = File.join(RAILS_ROOT, "spec/models")
 UNIT_TEST_DIR   = File.join(RAILS_ROOT, "test/unit"  )
-FIXTURE_DIR     = ENV['FIXTURES'] ? "#{ENV['FIXTURES']}/fixtures" : [File.join(RAILS_ROOT, "spec/fixtures"), File.join(RAILS_ROOT, "test/fixtures")].detect { |dir| File.exists?(dir) }
+FIXTURE_DIR     = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : SPEC_MODEL_DIR ? "spec" : "test"}/fixtures")
 SORT_COLUMNS    = ENV['SORT'] ? ENV['SORT'] != 'no' : true
 
 module AnnotateModels
