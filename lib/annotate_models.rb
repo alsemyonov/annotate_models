@@ -1,10 +1,11 @@
 require "config/environment"
 
-MODEL_DIR       = File.join(RAILS_ROOT, "app/models" )
-SPEC_MODEL_DIR  = File.join(RAILS_ROOT, "spec/models")
-UNIT_TEST_DIR   = File.join(RAILS_ROOT, "test/unit"  )
-FIXTURE_DIR     = ENV['FIXTURES'] ? "#{ENV['FIXTURES']}/fixtures" : [File.join(RAILS_ROOT, "spec/fixtures"), File.join(RAILS_ROOT, "test/fixtures")].detect { |dir| File.exists?(dir) }
-SORT_COLUMNS    = ENV['SORT'] ? ENV['SORT'] != 'no' : true
+MODEL_DIR         = File.join(RAILS_ROOT, "app/models" )
+UNIT_TEST_DIR     = File.join(RAILS_ROOT, "test/unit"  )
+SPEC_MODEL_DIR    = File.join(RAILS_ROOT, "spec/models")
+FIXTURES_DIR      = File.join(RAILS_ROOT, "test/fixtures")
+SPEC_FIXTURES_DIR = File.join(RAILS_ROOT, "spec/fixtures")
+SORT_COLUMNS      = ENV['SORT'] ? ENV['SORT'] != 'no' : true
 
 module AnnotateModels
 
@@ -88,12 +89,15 @@ module AnnotateModels
 
   def self.annotate(klass, header)
     info = get_schema_info(klass, header)
-    
+    model_name = klass.name.underscore
+    fixtures_name = "#{klass.table_name}.yml"
+
     [
-      File.join(MODEL_DIR, klass.name.underscore + ".rb"),            # model
-      File.join(SPEC_MODEL_DIR, klass.name.underscore + "_spec.rb"),  # spec
-      File.join(UNIT_TEST_DIR, klass.name.underscore + "_test.rb"),   # test
-      File.join(FIXTURE_DIR, klass.table_name + ".yml"),              # fixture
+      File.join(MODEL_DIR,          "#{model_name}.rb"),      # model
+      File.join(UNIT_TEST_DIR,      "#{model_name}_test.rb"), # test
+      File.join(FIXTURES_DIR,       fixtures_name),           # fixture
+      File.join(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
+      File.join(SPEC_FIXTURES_DIR,  fixtures_name),           # spec fixture
     ].each { |file| annotate_one_file(file, info) }
   end
 
@@ -125,19 +129,18 @@ module AnnotateModels
       header << "\n# Schema version: #{version}"
     end
 
-    annotated = []
-    self.get_model_names.each do |m|
-      class_name = m.sub(/\.rb$/,'').camelize
+    annotated = self.get_model_names.inject([]) do |list, m|
+      class_name = m.sub(/\.rb$/, '').camelize
       begin
         klass = class_name.split('::').inject(Object){ |klass,part| klass.const_get(part) }
         if klass < ActiveRecord::Base && !klass.abstract_class?
-          annotated << class_name
+          list << class_name
           self.annotate(klass, header)
         end
       rescue Exception => e
         puts "Unable to annotate #{class_name}: #{e.message}"
       end
-      
+      list
     end
     puts "Annotated #{annotated.join(', ')}"
   end
