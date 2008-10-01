@@ -1,14 +1,17 @@
-AnnotateSchema
+AnnotateModels
 ==============
 
 Add a comment summarizing the current schema to the bottom
-of each ActiveRecord model source file:
+of each ActiveRecord model, RSpec, TU, Fixtures and Factory source file:
 
-  # Schema as of Sun Feb 26 21:58:32 CST 2006 (schema version 7)
+  # == Schema Info
+  # Schema version: 20081001061831
   #
-  #  id                  :integer(11)   not null
-  #  quantity            :integer(11)   
-  #  product_id          :integer(11)   
+  # Table name: line_item
+  #
+  #  id                  :integer(11)    not null, primary key
+  #  quantity            :integer(11)    not null
+  #  product_id          :integer(11)    not null
   #  unit_price          :float         
   #  order_id            :integer(11)   
   #
@@ -20,17 +23,23 @@ of each ActiveRecord model source file:
 Note that this code will blow away the initial/final comment block in your models if it looks ike it was
 previously added by annotate models, so you don't want to add additional text to an automatically
 created comment block.
-
+You must avoid something that looks like the first line (# == Schema Info).
 
 == How to use:
 
-Will annotate all your models:
+To annotate all your models and factory.rb (if present on spec/ or test/):
 
   rake db:annotate
   
+To migrate & annotate:
+
+  rake db:update
+  
+  
 Options:
+
 Annotate on the head of the file:
- 
+
   rake db:annotate POSITION='top'
   
 
@@ -39,6 +48,15 @@ Annotate on the head of the file:
 Author:
    Dave Thomas
    Pragmatic Programmers, LLC
+   
+This fork:
+   Marcos Piccinini
+   http://github.com/nofxx/annotate_models
+   
+Forked from:
+   Rotuka
+   http://github.com/rotuka/annotate_models
+   
    
 Released under the same license as Ruby. No Support. No Warranty.
 

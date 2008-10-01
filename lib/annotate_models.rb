@@ -1,10 +1,12 @@
 require "config/environment"
 
-MODEL_DIR       = File.join(RAILS_ROOT, "app/models" )
-SPEC_MODEL_DIR  = File.join(RAILS_ROOT, "spec/models")
-UNIT_TEST_DIR   = File.join(RAILS_ROOT, "test/unit"  )
-FIXTURE_DIR     = File.join(RAILS_ROOT, "#{ENV['FIXTURES'] ? ENV['FIXTURES'] : SPEC_MODEL_DIR ? "spec" : "test"}/fixtures")
-SORT_COLUMNS    = ENV['SORT'] ? ENV['SORT'] != 'no' : true
+MODEL_DIR         = File.join(RAILS_ROOT, "app/models" )
+UNIT_TEST_DIR     = File.join(RAILS_ROOT, "test/unit"  )
+SPEC_MODEL_DIR    = File.join(RAILS_ROOT, "spec/models")
+FIXTURES_DIR      = File.join(RAILS_ROOT, "test/fixtures")
+SPEC_FIXTURES_DIR = File.join(RAILS_ROOT, "spec/fixtures")
+FACTORY_FILE      = File.join(RAILS_ROOT, "spec/factory.rb")  ||  File.join(RAILS_ROOT, "test/factory.rb")
+SORT_COLUMNS      = ENV['SORT'] ? ENV['SORT'] != 'no' : true
 
 module AnnotateModels
 
@@ -29,8 +31,7 @@ module AnnotateModels
   # each column. The line contains the column name,
   # the type (and length), and any optional attributes
   def self.get_schema_info(klass, header)
-    info = "# #{header}\n#\n"
-    info << "# Table name: #{klass.table_name}\n#\n"
+    info = "# Table name: #{klass.table_name}\n#\n"
     
     max_size = klass.column_names.collect{|name| name.size}.max + 1
     if SORT_COLUMNS
@@ -43,8 +44,9 @@ module AnnotateModels
       else
         klass.columns
       end.each { |col| info << annotate_column(col, klass, max_size) }
-
+      anotate_factory(info) if FACTORY_FILE
     info << "\n"
+    info = "# #{header}\n#\n" + info
   end
   
   def self.annotate_column(col, klass, max_size)
@@ -73,8 +75,8 @@ module AnnotateModels
 
       # Remove old schema info
       content.sub!(/^# #{PREFIX}.*?\n(#.*\n)*\n/, '')
+      # Write it back 
 
-      # Write it back
       File.open(file_name, "w") do |f| 
         f.puts ENV['POSITION'] == 'top' ?  info_block + content : content + info_block 
       end
@@ -88,12 +90,15 @@ module AnnotateModels
 
   def self.annotate(klass, header)
     info = get_schema_info(klass, header)
-    
+    model_name = klass.name.underscore
+    fixtures_name = "#{klass.table_name}.yml"
+
     [
-      File.join(MODEL_DIR, klass.name.underscore + ".rb"),            # model
-      File.join(SPEC_MODEL_DIR, klass.name.underscore + "_spec.rb"),  # spec
-      File.join(UNIT_TEST_DIR, klass.name.underscore + "_test.rb"),   # test
-      File.join(FIXTURE_DIR, klass.table_name + ".yml"),              # fixture
+      File.join(MODEL_DIR,          "#{model_name}.rb"),      # model
+      File.join(UNIT_TEST_DIR,      "#{model_name}_test.rb"), # test
+      File.join(FIXTURES_DIR,       fixtures_name),           # fixture
+      File.join(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
+      File.join(SPEC_FIXTURES_DIR,  fixtures_name),           # spec fixture
     ].each { |file| annotate_one_file(file, info) }
   end
 
@@ -117,28 +122,44 @@ module AnnotateModels
   # ActiveRecord models. If we can find the class, and
   # if its a subclass of ActiveRecord::Base,
   # then pas it to the associated block
-
   def self.do_annotations
     header = PREFIX.dup
-    version = ActiveRecord::Migrator.current_version rescue 0
-    if version > 0
-      header << "\n# Schema version: #{version}"
-    end
+    header << get_schema_version
 
-    annotated = []
-    self.get_model_names.each do |m|
-      class_name = m.sub(/\.rb$/,'').camelize
+    annotated = self.get_model_names.inject([]) do |list, m|
+      class_name = m.sub(/\.rb$/, '').camelize
       begin
         klass = class_name.split('::').inject(Object){ |klass,part| klass.const_get(part) }
         if klass < ActiveRecord::Base && !klass.abstract_class?
-          annotated << class_name
+          list << class_name
           self.annotate(klass, header)
         end
       rescue Exception => e
         puts "Unable to annotate #{class_name}: #{e.message}"
       end
-      
+      list
     end
+    write_factory if FACTORY_FILE
     puts "Annotated #{annotated.join(', ')}"
+  end
+  
+  def self.get_schema_version
+    version = ActiveRecord::Migrator.current_version rescue 0
+    version > 0 ? "\n# Schema version: #{version}" : ''
+  end
+  
+  def self.anotate_factory(info)
+    @all ||= []
+    @all << "#\n# = - - - - - - - - - -\n#\n#{info}"
+  end
+  
+  def self.write_factory
+    content = File.read(FACTORY_FILE)
+    prefix = '== db:annotate'
+    @all = "# #{prefix}\n##{get_schema_version}\n#{@all}\n"
+    content.sub!(/^# #{prefix}\n(#.*\n)*/, '')
+    File.open(FACTORY_FILE, "w") do |f| 
+      f.puts ENV['POSITION'] == 'top' ?  @all + content : content + @all
+    end
   end
 end
