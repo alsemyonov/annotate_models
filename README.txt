@@ -1,8 +1,10 @@
-AnnotateModels
-==============
+  _
+ /_|      _/__/_   /|/|   _/_ / _
+(  |/)/)()/(//(-  /   |()(/(-(_)
+________________________________
 
-Add a comment summarizing the current schema to the bottom
-of each ActiveRecord model, RSpec, TU, Fixtures and Factory source file:
+Add a comment summarizing the current schema to the bottom of each 
+ActiveRecord model, Test File, Fixture and Factory source file:
 
   # == Schema Info
   # Schema version: 20081001061831
@@ -16,16 +18,17 @@ of each ActiveRecord model, RSpec, TU, Fixtures and Factory source file:
   #  order_id            :integer(11)   
   #
 
-  class LineItem < ActiveRecord::Base belongs_to :product
-  
+  class LineItem < ActiveRecord::Base 
+    belongs_to :product  
    . . .
   
-Note that this code will blow away the initial/final comment block in your models if it looks ike it was
-previously added by annotate models, so you don't want to add additional text to an automatically
-created comment block.
-You must avoid something that looks like the first line (# == Schema Info).
+Note that this code will blow away the initial/final comment block in your models 
+if it looks like it was previously added by annotate models, so you don't want to 
+add additional text to an automatically created comment block.
 
-== How to use:
+                = = Back up your model files before using... = =
+
+== HOW TO USE:
 
 To annotate all your models and factory.rb (if present on spec/ or test/):
 
@@ -43,7 +46,7 @@ Annotate on the head of the file:
   rake db:annotate POSITION='top'
   
 
-== License:
+== LICENSE:
 
 Author:
    Dave Thomas
@@ -57,7 +60,4 @@ Forked from:
    Rotuka
    http://github.com/rotuka/annotate_models
    
-   
 Released under the same license as Ruby. No Support. No Warranty.
-
-Back up your model files before using...

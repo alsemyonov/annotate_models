@@ -155,7 +155,7 @@ module AnnotateModels
   
   def self.write_factory
     content = File.read(FACTORY_FILE)
-    prefix = '== db:annotate'
+    prefix = '== Annotate Models:'
     @all = "# #{prefix}\n##{get_schema_version}\n#{@all}\n"
     content.sub!(/^# #{prefix}\n(#.*\n)*/, '')
     File.open(FACTORY_FILE, "w") do |f| 
