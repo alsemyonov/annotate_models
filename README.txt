@@ -3,20 +3,21 @@
 (  |/)/)()/(//(-  /   |()(/(-(_)
 ________________________________
 
-Add a comment summarizing the current schema to the bottom of each 
-ActiveRecord model, Test File, Fixture and Factory source file:
+Add a comment summarizing the current schema to the 
+bottom of each ActiveRecord model, Test File, 
+Exemplar, Fixture and Factory source file:
 
-  # == Schema Info
-  # Schema version: 20081001061831
-  #
-  # Table name: line_item
-  #
-  #  id                  :integer(11)    not null, primary key
-  #  quantity            :integer(11)    not null
-  #  product_id          :integer(11)    not null
-  #  unit_price          :float         
-  #  order_id            :integer(11)   
-  #
+ # == Schema Info
+ # Schema version: 20081001061831
+ #
+ # Table name: line_item
+ #
+ #  id                  :integer(11)    not null, primary key
+ #  quantity            :integer(11)    not null
+ #  product_id          :integer(11)    not null
+ #  unit_price          :float         
+ #  order_id            :integer(11)   
+ #
 
   class LineItem < ActiveRecord::Base 
     belongs_to :product  
@@ -26,7 +27,7 @@ Note that this code will blow away the initial/final comment block in your model
 if it looks like it was previously added by annotate models, so you don't want to 
 add additional text to an automatically created comment block.
 
-                = = Back up your model files before using... = =
+           * * Back up your model files before using... * *
 
 == HOW TO USE:
 
