@@ -50,16 +50,11 @@ Annotate on the head of the file:
 
 == LICENSE:
 
-Author:
+Original code by:
    Dave Thomas
    Pragmatic Programmers, LLC
 
-This fork:
-   Marcos Piccinini
-   http://github.com/nofxx/annotate_models
-
-Forked from:
-   Rotuka
-   http://github.com/rotuka/annotate_models
+Refactored, improved by
+   Alexander Semyonov (http://github.com/rotuka/annotate_models), Marcos Piccinini (http://github.com/nofxx/annotate_models)
 
 Released under the same license as Ruby. No Support. No Warranty.
