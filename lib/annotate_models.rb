@@ -43,7 +43,6 @@ module AnnotateModels
       else
         klass.columns
       end.each { |col| info << annotate_column(col, klass, max_size) }
-      anotate_factory(info) if FACTORY_FILE
     info << "\n"
     info = "# #{header}\n#\n" + info
   end
@@ -140,27 +139,11 @@ module AnnotateModels
       end
       list
     end
-    write_factory if FACTORY_FILE
     puts "Annotated #{annotated.join(', ')}"
   end
 
   def self.get_schema_version
     version = ActiveRecord::Migrator.current_version rescue 0
     version > 0 ? "\n# Schema version: #{version}" : ''
-  end
-
-  def self.anotate_factory(info)
-    @all ||= []
-    @all << "#\n# = - - - - - - - - - -\n#\n#{info}"
-  end
-
-  def self.write_factory
-    content = File.read(FACTORY_FILE)
-    prefix = '== Annotate Models:'
-    @all = "# #{prefix}\n##{get_schema_version}\n#{@all}\n"
-    content.sub!(/^# #{prefix}\n(#.*\n)*/, '')
-    File.open(FACTORY_FILE, "w") do |f|
-      f.puts ENV['POSITION'] == 'top' ?  @all + content : content + @all
-    end
   end
 end
