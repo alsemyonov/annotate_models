@@ -5,11 +5,7 @@ UNIT_TEST_DIR     = File.join(RAILS_ROOT, "test/unit"  )
 SPEC_MODEL_DIR    = File.join(RAILS_ROOT, "spec/models")
 FIXTURES_DIR      = File.join(RAILS_ROOT, "test/fixtures")
 SPEC_FIXTURES_DIR = File.join(RAILS_ROOT, "spec/fixtures")
-EXEMPLARS_DIR     = File.join(RAILS_ROOT, "spec/exemplars")
-SORT_COLUMNS      = ENV['SORT'] ? ENV['SORT'] != 'no' : true
-FACTORY_FILE      = File.
-  join(RAILS_ROOT, "spec/factory.rb")  ||  File.
-  join(RAILS_ROOT, "test/factory.rb") rescue nil
+SORT_COLUMNS      = ENV['SORT'] != 'no'
 
 module AnnotateModels
 
@@ -102,7 +98,8 @@ module AnnotateModels
       File.join(FIXTURES_DIR,       fixtures_name),           # fixture
       File.join(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
       File.join(SPEC_FIXTURES_DIR,  fixtures_name),           # spec fixture
-      File.join(EXEMPLARS_DIR,      "#{model_name}_exemplar.rb"),
+      File.join(RAILS_ROOT,         'test', 'factories.rb'),  # factories file
+      File.join(RAILS_ROOT,         'spec', 'factories.rb'),  # factories file
     ].each { |file| annotate_one_file(file, info) }
   end
 
