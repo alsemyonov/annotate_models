@@ -10,6 +10,7 @@ SORT_COLUMNS      = ENV['SORT'] != 'no'
 module AnnotateModels
 
   PREFIX = "== Schema Info"
+  SEP_LINES = "\n\n"
 
   # Simple quoting for the default column value
   def self.quote(value)
@@ -30,10 +31,10 @@ module AnnotateModels
   # each column. The line contains the column name,
   # the type (and length), and any optional attributes
   def self.get_schema_info(klass, header)
-    info = "# Table name: #{klass.table_name}\n#\n"
-
+    table_info = "# Table name: #{klass.table_name}\n#\n"
     max_size = klass.column_names.collect{|name| name.size}.max + 1
-    if SORT_COLUMNS
+
+    cols = if SORT_COLUMNS
         pk    = klass.columns.find_all { |col| col.name == klass.primary_key }.flatten
         assoc = klass.columns.find_all { |col| col.name.match(/_id$/) }.sort_by(&:name)
         dates = klass.columns.find_all { |col| col.name.match(/_on$/) }.sort_by(&:name)
@@ -42,9 +43,11 @@ module AnnotateModels
         pk + assoc + (klass.columns - pk - assoc - times - dates).compact.sort_by(&:name) + dates + times
       else
         klass.columns
-      end.each { |col| info << annotate_column(col, klass, max_size) }
-    info << "\n"
-    info = "# #{header}\n#\n" + info
+      end
+
+    cols_text = cols.map{|col| annotate_column(col, klass, max_size)}.join("\n")
+
+    "# #{header}\n#\n" + table_info + cols_text
   end
 
   def self.annotate_column(col, klass, max_size)
@@ -59,7 +62,7 @@ module AnnotateModels
       else
         col_type << "(#{col.limit})" if col.limit
       end
-      sprintf("#  %-#{max_size}.#{max_size}s:%-15.15s %s", col.name, col_type, attrs.join(", ")).rstrip << "\n"
+      sprintf("#  %-#{max_size}.#{max_size}s:%-15.15s %s", col.name, col_type, attrs.join(", ")).rstrip
   end
 
   # Add a schema block to a file. If the file already contains
@@ -72,11 +75,15 @@ module AnnotateModels
       content = File.read(file_name)
 
       # Remove old schema info
-      content.sub!(/^# #{PREFIX}.*?\n(#.*\n)*\n/, '')
-      # Write it back
+      content.sub!(/(\n)*^# #{PREFIX}.*?\n(#.*\n)*#.*(\n)*/, '')
 
+      # Write it back
       File.open(file_name, "w") do |f|
-        f.puts ENV['POSITION'] == 'top' ?  info_block + content : content + info_block
+        if ENV['POSITION'] == 'top'
+          f.print info_block + SEP_LINES + content
+        else
+          f.print content + SEP_LINES + info_block
+        end
       end
     end
   end
