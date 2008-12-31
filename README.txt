@@ -13,11 +13,10 @@ Exemplar, Fixture and Factory source file:
  # Table name: line_item
  #
  #  id                  :integer(11)    not null, primary key
- #  quantity            :integer(11)    not null
- #  product_id          :integer(11)    not null
- #  unit_price          :float
  #  order_id            :integer(11)
- #
+ #  product_id          :integer(11)    not null
+ #  quantity            :integer(11)    not null
+ #  unit_price          :float
 
   class LineItem < ActiveRecord::Base
     belongs_to :product
@@ -55,6 +54,8 @@ Original code by:
    Pragmatic Programmers, LLC
 
 Refactored, improved by
-   Alexander Semyonov (http://github.com/rotuka/annotate_models), Marcos Piccinini (http://github.com/nofxx/annotate_models)
+   Alexander Semyonov (http://github.com/rotuka/annotate_models)
+   Marcos Piccinini (http://github.com/nofxx/annotate_models)
+   Stephen Anderson (http://github.com/bendycode/annotate_models)
 
 Released under the same license as Ruby. No Support. No Warranty.
