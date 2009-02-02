@@ -46,6 +46,10 @@ Annotate on the head of the file:
 
   rake db:annotate POSITION='top'
 
+Annotate models in non-standard directories:
+
+  rake db:annotate MODEL_DIR='vendor/plugins/example_engine/app/models'
+
 
 == LICENSE:
 
@@ -57,5 +61,6 @@ Refactored, improved by
    Alexander Semyonov (http://github.com/rotuka/annotate_models)
    Marcos Piccinini (http://github.com/nofxx/annotate_models)
    Stephen Anderson (http://github.com/bendycode/annotate_models)
+   Lightning Dave Bolton (http://github.com/lightningdb/annotate_models)
 
 Released under the same license as Ruby. No Support. No Warranty.

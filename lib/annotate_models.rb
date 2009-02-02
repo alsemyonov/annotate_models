@@ -97,9 +97,10 @@ module AnnotateModels
     info = get_schema_info(klass, header)
     model_name = klass.name.underscore
     fixtures_name = "#{klass.table_name}.yml"
+    model_dir = ENV['MODEL_DIR'] ? ENV['MODEL_DIR'] : MODEL_DIR
 
     [
-      File.join(MODEL_DIR,          "#{model_name}.rb"),      # model
+      File.join(model_dir,          "#{model_name}.rb"),      # model
       File.join(UNIT_TEST_DIR,      "#{model_name}_test.rb"), # test
       File.join(FIXTURES_DIR,       fixtures_name),           # fixture
       File.join(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
@@ -116,9 +117,10 @@ module AnnotateModels
   # app/models directory.
   def self.get_model_names
     models = ENV['MODELS'] ? ENV['MODELS'].split(',') : []
+    model_dir = ENV['MODEL_DIR'] ? ENV['MODEL_DIR'] : MODEL_DIR
 
     if models.empty?
-      Dir.chdir(MODEL_DIR) do
+      Dir.chdir(model_dir) do
         models = Dir["**/*.rb"]
       end
     end
