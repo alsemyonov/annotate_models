@@ -1,3 +1,8 @@
+2009-02-02 Lightning Dave Bolton <david@davidbolton.net>
+  * Allow alternate model directories to be passed in via the MODEL_DIR
+  	environment variable.  Allows annotations on models that are outside of the
+  	typical Rails structure (such as with Rails Engines).
+
 2008-10-02 Marcos Piccinini <chadart@gmail.com>
   * annotates object daddy exemplar files.
 
