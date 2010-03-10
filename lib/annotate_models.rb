@@ -75,7 +75,7 @@ module AnnotateModels
       content = File.read(file_name)
 
       # Remove old schema info
-      content.sub!(/(\n)*^# #{PREFIX}.*?\n(#.*\n)*#.*(\n)*/, '')
+      content.sub!(/(\s)*^# #{PREFIX}.*?\s(#.*\s)*#.*(\s)*/, '')
 
       # Write it back
       File.open(file_name, "w") do |f|
