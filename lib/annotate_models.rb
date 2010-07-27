@@ -5,7 +5,7 @@ UNIT_TEST_DIR     = File.join(Rails.root, "test/unit"  )
 SPEC_MODEL_DIR    = File.join(Rails.root, "spec/models")
 FIXTURES_DIR      = File.join(Rails.root, "test/fixtures")
 SPEC_FIXTURES_DIR = File.join(Rails.root, "spec/fixtures")
-SORT_COLUMNS      = ENV['SORT'] != 'no'
+SORT_COLUMNS      = ENV['SORT'] == 'yes'
 
 module AnnotateModels
 
