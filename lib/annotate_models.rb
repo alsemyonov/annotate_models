@@ -1,4 +1,4 @@
-require "config/environment"
+require File.join(Rails.root, "config/environment")
 
 MODEL_DIR         = File.join(Rails.root, "app/models" )
 UNIT_TEST_DIR     = File.join(Rails.root, "test/unit"  )
