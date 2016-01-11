@@ -58,7 +58,7 @@ Original code by:
    Pragmatic Programmers, LLC
 
 Refactored, improved by
-   Alexander Semyonov (http://github.com/rotuka/annotate_models)
+   Alexander Semyonov (http://github.com/alsemyonov/annotate_models)
    Marcos Piccinini (http://github.com/nofxx/annotate_models)
    Stephen Anderson (http://github.com/bendycode/annotate_models)
    Lightning Dave Bolton (http://github.com/lightningdb/annotate_models)
